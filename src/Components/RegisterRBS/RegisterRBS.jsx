@@ -1,14 +1,27 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import app from '../../firebase/firebase.config'
 
 const RegisterRBS = () => {
+
+  const auth = getAuth(app)
 
     const handleRegister = event =>{
         event.preventDefault();
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password);
+        // create user in firebase
+        createUserWithEmailAndPassword(auth, email, password)
+        .then(result =>{
+          const loggedUser = result.user;
+          console.log(loggedUser);
+        })
+        .catch((error) =>{
+          console.error(error)
+        })
     }
 
 
