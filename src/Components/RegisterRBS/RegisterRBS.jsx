@@ -9,11 +9,13 @@ const RegisterRBS = () => {
   const auth = getAuth(app)
 
     const handleRegister = event =>{
+      // 1. prevent page refresh
         event.preventDefault();
+        // 2. collect form data
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password);
-        // create user in firebase
+        // 3. create user in firebase
         createUserWithEmailAndPassword(auth, email, password)
         .then(result =>{
           const loggedUser = result.user;
