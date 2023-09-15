@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import {getAuth, sendPasswordResetEmail, signInWithEmailAndPassword} from 'firebase/auth';
+import app from '../../firebase/firebase.config'
+import { Link } from 'react-router-dom';
+
+const auth = getAuth(app)
 
 const Login = () => {
 
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const emailRef = useRef();
 
 
     const handleLogin = event =>{
@@ -24,7 +31,37 @@ const Login = () => {
             return;
         }
 
+        signInWithEmailAndPassword(auth, email, password)
+        .then(result =>{
+            const loggedUser = result.user;
+            console.log(loggedUser);
+            if(!loggedUser.emailVerified){
 
+            }
+            setSuccess('User Login Successful.');
+            setError('');
+        })
+        .catch(error =>{
+            setError(error.message);
+        })
+
+
+    }
+
+    const handleResetPassword = event =>{
+        const email = emailRef.current.value;
+        if(!email){
+            alert('Please Provide your email address to reset password')
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+        .then(() =>{
+            alert('Please check your email')
+        })
+        .catch(error =>{
+            console.log(error);
+            setError(error.message)
+        })
     }
 
 
@@ -34,7 +71,7 @@ const Login = () => {
             <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control type="email" name='email' placeholder="Enter email" required />
+                    <Form.Control type="email" ref={emailRef} name='email' placeholder="Enter email" required />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -42,6 +79,7 @@ const Login = () => {
                     <Form.Control type="password" name='password' placeholder="Password" required />
                 </Form.Group>
                 <p className='text-danger'>{error}</p>
+                <p className='text-success'>{success}</p>
 
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
                     <Form.Check type="checkbox" label="Accept Terms and Conditions" />
@@ -51,6 +89,8 @@ const Login = () => {
                     Submit
                 </Button>
             </Form>
+            <p><small>Forget Password? Please <button onClick={handleResetPassword} className='btn btn-link'>Reset Password</button></small></p>
+            <p><small>New to this website? Please <Link to="/registerRBS">Register</Link> </small></p>
         </div>
     );
 };
